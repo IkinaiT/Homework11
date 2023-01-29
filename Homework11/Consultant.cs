@@ -30,7 +30,7 @@ namespace Homework11
                     changedData += " паспорт";
 
                 return new User(surname, name, patronymic, phoneNumber, passport, DateTime.Now.ToString(), 
-                                this.Surname + " " + this.Name + " " + this.Patronymic + ", консультант" + changedData);
+                                this.Surname + " " + this.Name + " " + this.Patronymic + ", консультант, " + changedData);
             }
         }
 

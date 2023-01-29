@@ -45,6 +45,7 @@ namespace Homework11
         {
             LockAll();
             CheckUser();
+            ConfirmButton.IsEnabled = true;
         }
 
         /// <summary>
@@ -230,13 +231,20 @@ namespace Homework11
         /// <returns>true если данные НЕ изменились, false если данные изменились</returns>
         private bool CheckOnConfirmClick()
         {
-            User currentUser = _redactedUsers[ListBox1.SelectedIndex];
+            try
+            {
+                User currentUser = _redactedUsers[ListBox1.SelectedIndex];
 
-            return SurnameTextBox.Text.Equals(currentUser.Surname) &&
-                   NameTextBox.Text.Equals(currentUser.Name) &&
-                   PatronymicTextBox.Text.Equals(currentUser.Patronymic) &&
-                   PhoneTextBox.Text.Equals(currentUser.PhoneNumber.ToString()) &&
-                   PassportTextBox.Text.Equals(currentUser.Passport);
+                return SurnameTextBox.Text.Equals(currentUser.Surname) &&
+                       NameTextBox.Text.Equals(currentUser.Name) &&
+                       PatronymicTextBox.Text.Equals(currentUser.Patronymic) &&
+                       PhoneTextBox.Text.Equals(currentUser.PhoneNumber.ToString()) &&
+                       PassportTextBox.Text.Equals(currentUser.Passport);
+            }
+            catch
+            {
+                return true;
+            }
         }
 
         /// <summary>
