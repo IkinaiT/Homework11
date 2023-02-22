@@ -43,9 +43,31 @@ namespace Homework11
         /// </summary>
         private void ComboBox1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            LockAll();
+            if (_employees[ComboBox1.SelectedIndex] is Consultant)
+            {
+                LockAll();
+            }
+            else
+            {
+                SurnameTextBox.IsEnabled = true;
+                NameTextBox.IsEnabled = true;
+                PatronymicTextBox.IsEnabled = true;
+                PhoneTextBox.IsEnabled = true;
+                PassportTextBox.IsEnabled = true;
+            }
+
             CheckUser();
             ConfirmButton.IsEnabled = true;
+            if (_employees[ComboBox1.SelectedIndex] is Manager)
+            {
+                DeleteButton.IsEnabled = true;
+                AddButton.IsEnabled = true;
+            }
+            else 
+            {
+                DeleteButton.IsEnabled = false; 
+                AddButton.IsEnabled = false;
+            }
         }
 
         /// <summary>
@@ -98,19 +120,8 @@ namespace Homework11
 
                     _users.RemoveAt(ListBox1.SelectedIndex);
 
-                    using (StreamWriter sw = new StreamWriter(_path))
-                    {
-                        foreach (User user in _users)
-                        {
-                            sw.WriteLine(user.Surname + "~" + user.Name + "~" + user.Patronymic + "~" + user.PhoneNumber + "~" + user.Passport + "~" + user.ChangedDT + "~" + user.ChangedEmplpoyee);
-                        }
-                    }
+                    UsersFileUpdate();
 
-                    FillUsersList();
-
-                    CheckUser();
-                    PhoneTextBox.Text = "";
-                    LockAll();
                 }
                 catch
                 {
@@ -262,6 +273,86 @@ namespace Homework11
             PatronymicTextBox.Text = "";
             PhoneTextBox.Text = "";
             PassportTextBox.Text = "";
+        }
+
+        /// <summary>
+        /// Действие при надатии кнопки удаления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                User selectedUser = _users[ListBox1.SelectedIndex];
+                string mbText = $"Вы действительно хотите удалить пользователя {selectedUser.Surname} {selectedUser.Name} {selectedUser.Patronymic}?";
+
+                if (MessageBox.Show(mbText, "Удаление пользователя", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    _users.RemoveAt(ListBox1.SelectedIndex);
+                    UsersFileUpdate();
+                    MessageBox.Show("Удалено", "Успех!");
+                }
+            }
+            catch 
+            {
+                MessageBox.Show("Не удалось выполнить операцию! Возможно, не был выблан пользователь", "Ошибка удаления");
+            }
+        }
+
+        /// <summary>
+        /// Действие при нажатии кнопки добавления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool resol = !string.IsNullOrEmpty(SurnameTextBox.Text) && !string.IsNullOrEmpty(NameTextBox.Text) &&
+                !string.IsNullOrEmpty(PatronymicTextBox.Text) && !string.IsNullOrEmpty(PhoneTextBox.Text) &&
+                !string.IsNullOrEmpty(PassportTextBox.Text);
+            if (resol)
+            {
+                string mbText = $"Вы действительно хотите добавить пользователя {SurnameTextBox.Text} {NameTextBox.Text} {PatronymicTextBox.Text}?";
+
+                if(MessageBox.Show(mbText, "Добавление пользователя", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    Manager manager = (Manager)_employees[ComboBox1.SelectedIndex];
+                    _users.Add(new User(SurnameTextBox.Text, NameTextBox.Text, PatronymicTextBox.Text, PhoneTextBox.Text, PassportTextBox.Text,
+                        $"Создан {DateTime.Now}", $"{manager.Surname} {manager.Name} {manager.Patronymic}"));
+                    UsersFileUpdate();
+                    MessageBox.Show("Добавлено", "Успех!");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Заполните все поля", "Ошибка добавления");
+            }
+        }
+
+        /// <summary>
+        /// Обновление файла пользователей после изменения, добавления или удаления
+        /// </summary>
+        private void UsersFileUpdate()
+        {
+            using (StreamWriter sw = new StreamWriter(_path))
+            {
+                foreach (User user in _users)
+                {
+                    sw.WriteLine(user.Surname + "~" + user.Name + "~" + user.Patronymic + "~" + user.PhoneNumber + "~" + user.Passport + "~" + user.ChangedDT + "~" + user.ChangedEmplpoyee);
+                }
+            }
+
+            FillUsersList();
+
+            CheckUser();
+            PhoneTextBox.Text = "";
+            LockAll();
+        }
+
+        private void Sort(object sender, RoutedEventArgs e)
+        {
+            _users.Sort();
+            UsersFileUpdate();
         }
     }
 

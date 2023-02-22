@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Homework11
 {
-    class User
+    class User : IComparable<User>
     {
         public string Surname { get; }
         public string Name { get; }
@@ -33,6 +33,12 @@ namespace Homework11
             Passport = passport;
             ChangedDT = changedDT;
             ChangedEmplpoyee = changedEmployee;
+        }
+
+        public int CompareTo(User obj)
+        {
+            if(obj is User user) return Surname.CompareTo(user.Surname);
+            else throw new ArgumentException("Некорректное значение параметра");
         }
     }
 }
